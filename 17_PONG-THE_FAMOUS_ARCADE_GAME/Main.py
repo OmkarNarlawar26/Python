@@ -16,14 +16,18 @@ ball = Ball()
 scoreboard = Scoreboard()
 
 screen.listen()
-screen.onkey(r_paddle.go_up, "Up")
-screen.onkey(r_paddle.go_down, "Down")
-screen.onkey(l_paddle.go_up, "w")
-screen.onkey(l_paddle.go_down, "s")
+
+# Right paddle
+screen.onkeypress(r_paddle.go_up, "Up")
+screen.onkeypress(r_paddle.go_down, "Down")
+
+# Left paddle
+screen.onkeypress(l_paddle.go_up, "w")
+screen.onkeypress(l_paddle.go_down, "s")
 
 game_is_on = True
 while game_is_on:
-    time.sleep(0.1)
+    time.sleep(ball.move_speed)
     screen.update()
     ball.move()
 
@@ -32,15 +36,25 @@ while game_is_on:
         ball.bounce_y()
 
     # detect collision with paddle
-    if ball.distance(r_paddle) < 50 and ball.xcor() > 320 or ball.distance(l_paddle) < 50 and ball.xcor() < -320:
+    if (ball.distance(r_paddle) < 50 and ball.xcor() > 320) or (ball.distance(l_paddle) < 50 and ball.xcor() < -320):
         ball.bounce_x()
 
     # detect when R paddle misses
     if ball.xcor() > 380:
         ball.reset_position()
+        scoreboard.l_point()
 
     # detect when L paddle misses
-    if ball.xcor() > -380:
+    if ball.xcor() < -380:
         ball.reset_position()
+        scoreboard.r_point()
+
+    # check is someone reacher 5 points
+    if scoreboard.l_score == 5:
+        game_is_on = False
+        scoreboard.game_over("LEFT PLAYER")
+    elif scoreboard.r_score == 5:
+        game_is_on = False
+        scoreboard.game_over("RIGHT PLAYER")
 
 screen.exitonclick()
