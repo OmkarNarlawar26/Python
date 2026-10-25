@@ -25,9 +25,24 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-emp1 = Employees(name='Omkar', position='Student')
-emp1.projects = [Projects(name='Python for Everyone'), Projects(name='Python DSA')]
-session.add(emp1)
+# emp1 = Employees(name='Omkar', position='Student')
+# emp1.projects = [Projects(name='Python for Everyone'), Projects(name='Python DSA')]
+# session.add(emp1)
+
+rows = [
+    Employees(
+        name = 'Om',
+        position = 'Intern',
+        projects = [Projects(name='Python Django'), Projects(name='Python Flask')]
+    ),
+    Employees(
+        name = 'Jay',
+        position = 'Developer',
+        projects = [Projects(name='SQLite Project'), Projects(name='SQLAlchemy Project')]
+    )
+]
+
+session.add_all(rows)
 session.commit()
 
 
