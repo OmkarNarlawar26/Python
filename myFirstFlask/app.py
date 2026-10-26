@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 from sqlalchemy import Column, Float, String, Integer
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from marshmallow import fields
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///country.db'
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 @app.route('/')
 def Jay_Ganesh():
@@ -42,7 +45,52 @@ def api_variables(name:str, age:int):
 @app.route('/countries', methods=['GET'])
 def countries():
     country_list = Country.query.all()
-    return jsonify(data=country_list)
+    result = countries_schema.dump(country_list)
+    return jsonify(result)
+
+
+@app.route('/country_details/<int:country_id>', methods=['GET'])
+def country_details(country_id:int):
+    country = Country.query.filter_by(country_id=country_id).first()
+    if country:
+        result = country_schema.dump(country)
+        return jsonify(result)
+    return jsonify("That country dose not exist!"), 404
+
+
+# This is done by using (form)
+@app.route('/add_country', methods=['POST'])
+def add_country():
+    country_name = request.form['country_name']
+    check_country = Country.query.filter_by(country_name=country_name).first()
+    if check_country:
+        return jsonify("The country by that name exists in DB"), 409  # 409 tell us that there is conflict
+    capital = request.form['capital']
+    area = request.form['area']
+    new_country = Country(country_name=country_name, capital=capital, area=area)
+    db.session.add(new_country)
+    db.session.commit()
+    return jsonify("New country added!"), 201
+
+
+
+# This is done by using (get)
+@app.route('/add_country1', methods=['POST'])
+def add_country1():
+    data = request.get_json()
+    if not data:
+        return jsonify("Invalid or missing JSON data"), 400
+    country_name = data.get('country_name')
+    check_country = Country.query.filter_by(country_name=country_name).first()
+    if check_country:
+        return jsonify("The country by that name exists in DB"), 409  # 409 tell us that there is conflict
+    capital = data.get('capital')
+    area = data.get('area')
+    new_country = Country(country_name=country_name, capital=capital, area=area)
+    db.session.add(new_country)
+    db.session.commit()
+    return jsonify(message="you added a new country"), 201
+
 
 # DATABASE
 class User(db.Model):
@@ -58,7 +106,35 @@ class Country(db.Model):
     country_id = Column(Integer, primary_key=True)
     country_name = Column(String)
     capital = Column(String)
-    area = Column(String)
+    area = Column(Float)
+
+
+class UserSchema(ma.Schema):
+    id = fields.Integer()
+    first_name = fields.String()
+    last_name = fields.String()
+    email = fields.Email()
+    password = fields.String()
+
+
+class CountrySchema(ma.Schema):
+    country_id = fields.Integer()
+    country_name = fields.String()
+    capital = fields.String()
+    area = fields.Float()
+
+# objects
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
+
+# objects
+country_schema = CountrySchema()
+countries_schema = CountrySchema(many=True)
+
+@app.cli.command('db_create')
+def db_create():
+    db.create_all()
+    print("Database Created!")
 
 @app.cli.command('db_drop')
 def db_drop():
