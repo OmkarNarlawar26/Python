@@ -42,7 +42,11 @@ def api_variables(name:str, age:int):
     else:
         return jsonify(message= f"Sorry {name}, you are not old enough to access this API")
 
-@app.route('/countries', methods=['GET'])
+
+
+
+# @app.route('/countries', methods=['GET'])         # Method 1
+@app.get('/countries')                              # Traditional method
 def countries():
     country_list = Country.query.all()
     result = countries_schema.dump(country_list)
@@ -58,8 +62,10 @@ def country_details(country_id:int):
     return jsonify("That country dose not exist!"), 404
 
 
+
 # This is done by using (form)
-@app.route('/add_country', methods=['POST'])
+# @app.route('/add_country', methods=['POST'])
+@app.post('/add_country')
 def add_country():
     country_name = request.form['country_name']
     check_country = Country.query.filter_by(country_name=country_name).first()
@@ -92,6 +98,7 @@ def add_country1():
     return jsonify(message="you added a new country"), 201
 
 
+
 @app.route('/countries/<int:country_id>', methods=['PATCH'])
 def update_country(country_id):
     data = request.get_json()
@@ -101,11 +108,23 @@ def update_country(country_id):
     if 'country_name' in data:
         country.country_name = data['country_name']
     if 'capital' in data:
-        country.country_name = data['capital']
+        country.captial = data['capital']
     if 'area' in data:
-        country.country_name = data['area']
+        country.area = data['area']
     db.session.commit()
     return jsonify({"message": "Country updates successfully", "country_id":country_id}), 200
+
+
+
+@app.route('/countries/<int:country_id>', methods=['DELETE'])
+def remove_country(country_id):
+    country = Country.query.filter_by(country_id=country_id).first()
+    if not country:
+        # return jsonify(message="Country not found"), 404                  # Option 1
+        return {"message": "Country not found"}                             # Option 2
+    db.session.delete(country)
+    db.session.commit()
+    return jsonify(message = f"You deleted a country with id of {country_id}"), 202
 
 
 # DATABASE
