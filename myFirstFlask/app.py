@@ -92,6 +92,22 @@ def add_country1():
     return jsonify(message="you added a new country"), 201
 
 
+@app.route('/countries/<int:country_id>', methods=['PATCH'])
+def update_country(country_id):
+    data = request.get_json()
+    country = Country.query.filter_by(country_id=country_id).first()
+    if not country:
+        return jsonify(message = "Country not found"), 404
+    if 'country_name' in data:
+        country.country_name = data['country_name']
+    if 'capital' in data:
+        country.country_name = data['capital']
+    if 'area' in data:
+        country.country_name = data['area']
+    db.session.commit()
+    return jsonify({"message": "Country updates successfully", "country_id":country_id}), 200
+
+
 # DATABASE
 class User(db.Model):
     __tablename__ = 'users'
