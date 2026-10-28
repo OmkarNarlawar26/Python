@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="PYTHON_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/12_COFFEE_MACHINE/oop-coffee-machine-start/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/14_HIRST_PAINTING/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/APIs/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/FlaskOP/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/SQLAlchemyORM/.venv" />
+      <excludeFolder url="file://$MODULE_DIR$/myFirstFlask/.venv" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PackageRequirementsSettings" />
+  <component name="ReSTService" />
+</module>
