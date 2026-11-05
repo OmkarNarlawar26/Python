@@ -1,11 +1,12 @@
 from flask import jsonify, request
-from app.init import app, db
+from app.init import app, db, auth
 from app.models.country import Country
 from app.schemas.country_schema import country_schema, countries_schema
 
 
 # @app.route('/countries', methods=['GET'])         # Method 1
 @app.get('/countries')                              # Traditional method
+@auth.login_required()
 def countries():
     country_list = Country.query.all()
     result = countries_schema.dump(country_list)
